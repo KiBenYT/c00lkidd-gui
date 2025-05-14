@@ -1,0 +1,163 @@
+local ScreenGui = Instance.new('ScreenGui')
+local Frame = Instance.new('Frame')
+local Frame2 = Instance.new('Frame')
+local ChangeCharacterEvent = Instance.new('RemoteEvent')
+local characterchanger = Instance.new('Script')
+local flyevent = Instance.new('Script')
+local FlyEvent = Instance.new('RemoteEvent')
+local Decal = Instance.new('Decal')
+local CoolKidModel = Instance.new('Model')
+local BodyColors = Instance.new('BodyColors')
+local Pants = Instance.new('Pants')
+local Shirt = Instance.new('Shirt')
+local Humanoid = Instance.new('Humanoid')
+local LeftFoot = Instance.new('MeshPart')
+local TextLabel = Instance.new('TextLabel')
+local LocalScript = Instance.new('LocalScript')
+
+ScreenGui.Enabled = true
+ScreenGui.ResetOnSpawn = false
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.Name = ScreenGui
+
+Frame.BackgroundColor3 = Color3.fromRGB(54 ,54, 54)
+Frame.Position = {0.225, 0},{0.242, 0}
+Frame.Parent = ScreenGui
+Frame.Size = {0, 508},{0, 264}
+Frame.Visible = true
+
+ChangeCharacterEvent.Parent = ScreenGui
+
+characterchanger.Name = characterchanger
+characterchanger.Parent = ScreenGui
+characterchanger.Source = [[
+
+local ChangeCharacterEvent = script.Parent:WaitForChild("ChangeCharacterEvent")
+local Players = game:GetService("Players")
+
+ChangeCharacterEvent.OnServerEvent:Connect(function(player, username)
+	local success, userId = pcall(function()
+		return Players:GetUserIdFromNameAsync(username)
+	end)
+
+	if success then
+		-- Cria o modelo do personagem com base no UserId
+		local charModel = Players:CreateHumanoidModelFromUserId(userId)
+		charModel.Name = player.Name
+
+		-- Salva a posição do personagem antigo
+		local oldChar = player.Character
+		local pos = oldChar and oldChar:FindFirstChild("HumanoidRootPart") and oldChar.HumanoidRootPart.CFrame
+
+		-- Troca o personagem
+		player.Character = charModel
+		charModel.Parent = workspace
+
+		-- Define a posição do novo personagem
+		if pos then
+			task.wait()
+			local root = charModel:FindFirstChild("HumanoidRootPart")
+			if root then
+				root.CFrame = pos
+			end
+		end
+
+		-- Apaga o personagem antigo
+		if oldChar then
+			oldChar:Destroy()
+		end
+	end
+end)
+
+]]
+
+flyevent.Parent = ScreenGui
+flyevent.Name = flyevent
+flyevent.Source = [[
+
+local flyEvent = script.Parent:WaitForChild("FlyEvent")
+local Players = game:GetService("Players")
+
+flyEvent.OnServerEvent:Connect(function(player, activate)
+	local character = player.Character
+	if character then
+		local humanoid = character:FindFirstChildOfClass("Humanoid")
+		if humanoid then
+			-- Se ativar o fly
+			if activate then
+				local bodyGyro = Instance.new("BodyGyro")
+				bodyGyro.MaxTorque = Vector3.new(400000, 400000, 400000)
+				bodyGyro.CFrame = character.HumanoidRootPart.CFrame
+				bodyGyro.P = 125000
+				bodyGyro.Parent = character.HumanoidRootPart
+
+				local bodyVelocity = Instance.new("BodyVelocity")
+				bodyVelocity.MaxForce = Vector3.new(9e9, 9e9, 9e9)
+				bodyVelocity.Velocity = Vector3.new(0, 0, 0)  -- Começar sem movimento
+				bodyVelocity.Parent = character.HumanoidRootPart
+
+				-- Atribui a flag de voo
+				player:SetAttribute("IsFlying", true)
+
+				-- Se desativar o fly
+			else
+				-- Remove o BodyGyro e BodyVelocity
+				local bodyGyro = character.HumanoidRootPart:FindFirstChild("BodyGyro")
+				local bodyVelocity = character.HumanoidRootPart:FindFirstChild("BodyVelocity")
+
+				if bodyGyro then bodyGyro:Destroy() end
+				if bodyVelocity then bodyVelocity:Destroy() end
+
+				player:SetAttribute("IsFlying", false)
+			end
+		end
+	end
+end)
+
+]]
+
+FlyEvent.Parent = ScreenGui
+FlyEvent.Name = FlyEvent
+
+Decal.Parent = ScreenGui
+Decal.Texture = 'http://www.roblox.com/asset/?id=1365169976'
+
+Frame2.Parent = ScreenGui
+Frame2.Name = Frame2
+Frame2.BackgroundColor = Color3.fromRGB(54, 54, 54)
+Frame2.Position = {0.225, 0},{0.242, 0}
+Frame2.Size = {0, 508},{0, 264}
+
+CoolKidModel.Parent = ScreenGui
+BodyColors.Parent = CoolKidModel
+Pants.Parent = CoolKidModel
+Pants.PantsTemplate = 'http://www.roblox.com/asset/?id=110300867394225'
+Shirt.Parent = CoolKidModel
+Shirt.ShirtTemplate = 'http://www.roblox.com/asset/?id=18554114253'
+Shirt.Name = Shirt
+Humanoid.Parent = CoolKidModel
+Humanoid.Name = Humanoid
+LeftFoot.MeshId = 'http://www.roblox.com/asset/?id=1699715602'
+LeftFoot.Name = LeftFoot
+
+TextLabel.Parent = Frame
+TextLabel.Position = {0, 0},{0, 0}
+TextLabel.Size = {0, 508},{0, 39}
+TextLabel.Name = TextLabel
+TextLabel.Text = 'c00lkidd gui'
+TextLabel.TextColor = Color3.fromRGB(255, 0, 0)
+TextLabel.TextStrokeColor3 = 0, 0, 0
+TextLabel.TextStrokeTransparency = 0
+TextLabel.BackgroundColor3 = Color3.fromRGB(54, 54, 54)
+TextLabel.BackgroundTransparency = 0
+
+LocalScript.Parent = Frame
+LocalScript.Source = [[
+
+local frame = script.Parent
+
+frame.Active = true
+frame.Draggable = true
+
+]]
+
